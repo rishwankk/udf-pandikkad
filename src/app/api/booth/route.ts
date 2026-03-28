@@ -39,8 +39,9 @@ export async function GET(req: NextRequest) {
 
     const all = await BoothStatus.find({}).sort({ booth: 1 });
     return NextResponse.json(all);
-  } catch {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("API Error:", error.message);
+    return NextResponse.json({ error: "Server error", details: error.message }, { status: 500 });
   }
 }
 
@@ -81,7 +82,8 @@ export async function POST(req: NextRequest) {
       { new: true }
     );
     return NextResponse.json(updated);
-  } catch {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("API Error:", error.message);
+    return NextResponse.json({ error: "Server error", details: error.message }, { status: 500 });
   }
 }

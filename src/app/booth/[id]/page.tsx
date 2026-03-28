@@ -70,13 +70,25 @@ export default function BoothPage() {
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);
-  const [entryTime] = useState(new Date());
+  const [error,   setPageError] = useState("");
+  const [entryTime, setEntryTime] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setEntryTime(new Date());
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch(`/api/booth?booth=${boothNum}`);
-      if (res.ok) setData(await res.json());
-    } catch { /* ignore */ }
+      if (res.ok) {
+        setData(await res.json());
+      } else {
+        const errJson = await res.json();
+        setPageError(errJson.details || "Database connection error (Check MongoDB Atlas IP Whitelist)");
+      }
+    } catch { 
+      setPageError("Unable to reach server. Please check your internet.");
+    }
     finally { setLoading(false); }
   }, [boothNum]);
 
@@ -102,28 +114,37 @@ export default function BoothPage() {
   const handleSave = async () => {
     if (!data) return;
     setSaving(true);
+    setPageError("");
     try {
       const res = await fetch("/api/booth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, booth: boothNum }),
       });
-      if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 4000); }
-    } catch { /* ignore */ }
+      if (res.ok) { 
+        setSaved(true); 
+        setTimeout(() => setSaved(false), 4000); 
+      } else {
+        const errJson = await res.json();
+        setPageError(errJson.details || "Failed to save update");
+      }
+    } catch { 
+      setPageError("Failed to connect to server");
+    }
     finally { setSaving(false); }
   };
 
   if (!boothInfo) return null;
 
-  const fmt = (d: Date | string) => new Date(d).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
-  const fmtDate = (d: Date | string) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  const fmt = (d: Date | string | null) => d ? new Date(d).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--:--";
+  const fmtDate = (d: Date | string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "---";
 
   const def: BData = {
     booth: boothNum, boothName: boothInfo.boothName, observer: boothInfo.observer,
     contact: boothInfo.contact, ward: boothInfo.ward || "",
     flex: { status: "", extraRequest: false }, poster: { status: "", extraRequest: false },
     round1: { status: "" }, round2: { status: "" }, round3: { status: "" },
-    kudumbaYogamDate: "", expectedLead: 0, entryTime: entryTime.toISOString(), lastUpdated: "",
+    kudumbaYogamDate: "", expectedLead: 0, entryTime: entryTime?.toISOString() || "", lastUpdated: "",
   };
 
   const d = data || def;
@@ -146,6 +167,16 @@ export default function BoothPage() {
         </div>
         {saved && <span className="nav-saved">✓ Saved</span>}
       </nav>
+
+      {/* Error Display */}
+      {error && (
+        <div style={{ margin: "14px 14px 0" }} className="entry-error">
+          ⚠ ERROR: {error}
+          <div style={{ fontSize: 10, marginTop: 4, opacity: 0.8 }}>
+            (Check MongoDB Atlas Network Access and Vercel Environment Variables)
+          </div>
+        </div>
+      )}
 
       {/* Observer card */}
       <div className="observer-card slide-up">

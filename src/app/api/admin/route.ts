@@ -83,7 +83,8 @@ export async function GET() {
     });
 
     return NextResponse.json(sorted);
-  } catch {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Admin API Error:", error.message);
+    return NextResponse.json({ error: "Server error", details: error.message }, { status: 500 });
   }
 }

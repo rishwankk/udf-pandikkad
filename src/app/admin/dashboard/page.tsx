@@ -16,7 +16,7 @@ interface BoothItem {
   flex: { status: string; extraRequest: boolean };
   poster: { status: string; extraRequest: boolean };
   round1: { status: string }; round2: { status: string }; round3: { status: string };
-  kudumbaYogamDate: string; expectedLead: number; lastUpdated: string; entryTime: string;
+  kudumbaYogamDate: string; expectedLead: number; adminComment?: string; lastUpdated: string; entryTime: string;
 }
 
 function MiniStatusBadge({ status }: { status: string }) {
@@ -640,6 +640,16 @@ export default function AdminDashboard() {
 
                     {b?.kudumbaYogamDate && (
                       <div className="yogam-alert">📅 Kudumba Yogam: {b.kudumbaYogamDate}</div>
+                    )}
+
+                    {b?.adminComment && (
+                      <div style={{ 
+                        marginTop: 8, padding: "8px 12px", borderRadius: 10,
+                        background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)",
+                        fontSize: 12, color: "#93c5fd", fontStyle: "italic", lineHeight: 1.4
+                      }}>
+                        💬 Message: "{b.adminComment}"
+                      </div>
                     )}
 
                     <div className="booth-updated" style={{ display: "flex", justifyContent: "space-between" }}>

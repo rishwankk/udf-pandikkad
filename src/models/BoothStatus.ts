@@ -25,6 +25,7 @@ export interface IBoothStatus extends Document {
   };
   kudumbaYogamDate: string;
   expectedLead: number;
+  adminComment: string;
   lastUpdated: Date;
   entryTime: Date;
 }
@@ -49,6 +50,7 @@ const BoothStatusSchema = new Schema<IBoothStatus>(
     round3: { status: { type: String, default: "" } },
     kudumbaYogamDate: { type: String, default: "" },
     expectedLead: { type: Number, default: 0 },
+    adminComment: { type: String, default: "" },
     lastUpdated: { type: Date, default: Date.now },
     entryTime: { type: Date, default: Date.now },
   },

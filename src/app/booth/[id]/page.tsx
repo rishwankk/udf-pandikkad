@@ -13,6 +13,7 @@ interface BData {
   round1: { status: SV }; round2: { status: SV }; round3: { status: SV };
   kudumbaYogamDate: string;
   expectedLead: number;
+  adminComment: string;
   entryTime: string; lastUpdated: string;
 }
 
@@ -144,7 +145,9 @@ export default function BoothPage() {
     contact: boothInfo.contact, ward: boothInfo.ward || "",
     flex: { status: "", extraRequest: false }, poster: { status: "", extraRequest: false },
     round1: { status: "" }, round2: { status: "" }, round3: { status: "" },
-    kudumbaYogamDate: "", expectedLead: 0, entryTime: entryTime?.toISOString() || "", lastUpdated: "",
+    kudumbaYogamDate: "", expectedLead: 0, 
+    adminComment: "",
+    entryTime: entryTime?.toISOString() || "", lastUpdated: "",
   };
 
   const d = data || def;
@@ -305,6 +308,17 @@ export default function BoothPage() {
                   }}
                 >Done</button>
               </div>
+            </TaskCard>
+
+            {/* ADMIN COMMENT */}
+            <TaskCard title="Message to Admin" icon="💬" delay={300}>
+               <textarea
+                value={d.adminComment || ""}
+                onChange={e => update("adminComment", e.target.value)}
+                className="date-input"
+                style={{ width: "100%", minHeight: "80px", fontSize: "14px", lineHeight: "1.5", resize: "none" }}
+                placeholder="Type your message to admin here..."
+              />
             </TaskCard>
 
             {d.lastUpdated && (
